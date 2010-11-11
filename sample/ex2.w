@@ -1,6 +1,5 @@
 
 declare
-	
 	var x ;
 	proc p(a, b) is 
 		declare 
