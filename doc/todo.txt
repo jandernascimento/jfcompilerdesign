@@ -1,8 +1,8 @@
 <JANDER>
 -Create environment variable/Sigma (done as stable) DONE
--Create a stack for environment variable ON GOING
+-Create a stack for environment variable DONE
 -Separate functions into different files, working as libraries
--Fix function stable_add to do not make reference to global variable
+-Fix function stable_add to do not make reference to global variable ON GOING
 </JANDER>
 
 <BE>
