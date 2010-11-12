@@ -1,0 +1,15 @@
+<JANDER>
+-Create environment variable/Sigma (done as stable) DONE
+-Create a stack for environment variable ON GOING
+-Separate functions into different files, working as libraries
+</JANDER>
+
+<BE>
+-Implement interpretation for node While ON GOING
+-Implement interpretation for node If
+-Implement interpretation for node Else
+-Implement interpretation for node EGal
+</BE>
+
+
+
