@@ -54,6 +54,17 @@ void stable_print(list *table){
 
 }
 
+void stable_sigma(list *table){
+	list *head=table;
+	printf("\tsigma[");
+	if(head!=NULL)
+	do {
+		printf("%s->%i,",head->name,head->value);
+		head=head->next;
+	} while(head!=NULL);
+	printf("]\n");
+}
+
 /** stable functions:end **/
 
 
@@ -143,12 +154,13 @@ NODE *n;
   	  pr_node(n->fd);
   	  break;
     case ASSIGN:
-  	  stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
-  	  pr_node(n->fg);
-  	  pr_node(n->fd);
+	  stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
+  	  print_node(n->fg);
+	  printf(":=") ;
+  	  print_node(n->fd);  
+  	  stable_sigma(stable);
           break;
     case PLUS:
-  	 // printf("ACHOU PLUS!!!!\n");
   	  pr_node(n->fg);
   	  pr_node(n->fd);
   	  break;
@@ -175,10 +187,9 @@ NODE *n;
   	  //printf("%d",(n->val_node).u_int);
   	  break;
     case IDF:
-  	  printf("--->%s\n", (n->val_node).u_str);
+  	  //printf("--->%s\n", (n->val_node).u_str);
   	  break;
     case VAR:
-  	  printf("ACHOU VAR!!!!");
   	  break;
     case CALL:
   	  pr_node(n->fg);
