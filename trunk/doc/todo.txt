@@ -2,6 +2,7 @@
 -Create environment variable/Sigma (done as stable) DONE
 -Create a stack for environment variable ON GOING
 -Separate functions into different files, working as libraries
+-Fix function stable_add to do not make reference to global variable
 </JANDER>
 
 <BE>
