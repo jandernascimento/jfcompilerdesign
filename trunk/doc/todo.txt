@@ -3,6 +3,7 @@
 -Create a stack for environment variable DONE
 -Separate functions into different files, working as libraries
 -Fix function stable_add to do not make reference to global variable DONE
+-Fix issue: it's possible to add many time the same variable DONE
 -Creating functions to copy envivinroment based in another environemnt ON GOING
 </JANDER>
 

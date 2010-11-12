@@ -19,6 +19,7 @@ void stable_add(list *table,char *name,int value){
 
 	list **original=table;
 	list *new_position=*original;
+	list *search=*original;
 	
 	if((*original)==NULL){
 		(*original)=malloc(sizeof(list));
@@ -26,15 +27,20 @@ void stable_add(list *table,char *name,int value){
 		(*original)->value=value;
 		(*original)->next=NULL;
 	}else{
+		for(;search!=NULL;search=search->next){
+			//printf("Comparando %s e %s cmp value:%i\n",search->name,name,strcmp(name,search->name));
+			if(strcmp(name,search->name)==0){
+				search->value=value;
+				return;
+			}	
+		}
 		list *new_node;
 		new_node=malloc(sizeof(list));
 		new_node->name=name;
 		new_node->value=value;
 		new_node->next=NULL;
-		//list *old_next=table->next;
 		for(;new_position->next!=NULL;new_position=new_position->next);
 		new_position->next=new_node;	
-		//new_node.next=old_next;
 	}	
 }
 
@@ -137,9 +143,7 @@ NODE *n;
   	  pr_node(n->fd);
   	  break;
     case ASSIGN:
-  	  //printf("ACHOU VAR!!!!\n");
   	  stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
-  	  //stable_add(stable,"x",3);
   	  pr_node(n->fg);
   	  pr_node(n->fd);
           break;
@@ -212,7 +216,7 @@ main (int argc, char *argv[])
 	pr_node(root);
 	//printf("Type:%i\n",MyNode->type_node);
   	//print_node(MyNode);
-	stable_add(&stable,"x",1);
+	stable_add(&stable,"x",100);
 	stable_add(&stable,"y",2);
 	
 	//stable_stack_push(stable);
