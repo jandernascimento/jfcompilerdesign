@@ -17,16 +17,15 @@ list *stable=NULL;
 
 void stable_add(list *table,char *name,int value){
 
-	list *new_position=table;
-
-	if(stable==NULL){
-		stable=malloc(sizeof(list));
-		stable->name=name;
-		stable->value=value;
-		stable->next=NULL;
+	list **original=table;
+	list *new_position=*original;
 	
+	if((*original)==NULL){
+		(*original)=malloc(sizeof(list));
+		(*original)->name=name;
+		(*original)->value=value;
+		(*original)->next=NULL;
 	}else{
-
 		list *new_node;
 		new_node=malloc(sizeof(list));
 		new_node->name=name;
@@ -43,10 +42,9 @@ void stable_print(list *table){
 	list *head=table;
 	if(head!=NULL)
 	do {
-	
 		printf("Name:%s Value:%i\n",head->name,head->value);
 		head=head->next;
-	}while(head!=NULL);
+	} while(head!=NULL);
 
 }
 
@@ -140,7 +138,7 @@ NODE *n;
   	  break;
     case ASSIGN:
   	  //printf("ACHOU VAR!!!!\n");
-  	  stable_add(stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
+  	  stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
   	  //stable_add(stable,"x",3);
   	  pr_node(n->fg);
   	  pr_node(n->fd);
@@ -211,18 +209,16 @@ main (int argc, char *argv[])
   if (result==0){
    	//print_tree() ;
   	//print_node(root);
-	
-	//pr_node(root);
-
+	pr_node(root);
 	//printf("Type:%i\n",MyNode->type_node);
   	//print_node(MyNode);
-	stable_add(stable,"x",1);
-	stable_add(stable,"y",2);
+	stable_add(&stable,"x",1);
+	stable_add(&stable,"y",2);
 	
-	stable_stack_push(stable);
-	stable_stack_print(stable);
-	printf("Original addr:%i\n",(int)stable);			
-	//stable_print(stable);
+	//stable_stack_push(stable);
+	//stable_stack_print(stable);
+	//printf("Original addr:%i\n",(int)stable);			
+	stable_print(stable);
 	
 	/* insert here the calls to the code generation main function */
   }
