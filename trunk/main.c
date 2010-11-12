@@ -13,11 +13,7 @@ typedef struct list_t {
 } list;
 
 list *stable=NULL;
-
-void stable_init(list *table){
-	//int value=0;
-	//table->next=NULL;
-}
+/** stable functions:start **/
 
 void stable_add(list *table,char *name,int value){
 
@@ -54,6 +50,41 @@ void stable_print(list *table){
 
 }
 
+/** stable functions:end **/
+
+
+/** stable stack functions:start **/
+
+list *stable_stack[40];;
+int stable_stack_size=0;
+
+void stable_stack_push(list *pstable){
+
+	stable_stack[stable_stack_size++]=pstable;
+
+}
+
+list *stable_stack_pop(){
+
+	list *tmp=stable_stack[stable_stack_size];
+
+	stable_stack[stable_stack_size--]=NULL;
+
+	return tmp;
+
+
+}
+
+void stable_stack_print(){
+
+	int x;
+	for(x=0;x<stable_stack_size;x++){
+		printf("Element %i in Addr: %i\n",x,stable_stack[x]);
+	}
+
+}
+
+/** stable stack functions:start **/
 
 extern FILE *yyin;
 extern print_tree() ;
@@ -142,7 +173,7 @@ NODE *n;
   	  //printf("%d",(n->val_node).u_int);
   	  break;
     case IDF:
-  	  //printf("%s", (n->val_node).u_str);
+  	  printf("--->%s\n", (n->val_node).u_str);
   	  break;
     case VAR:
   	  printf("ACHOU VAR!!!!");
@@ -180,17 +211,18 @@ main (int argc, char *argv[])
   if (result==0){
    	//print_tree() ;
   	//print_node(root);
-	//while(Droit(MyNode)!=NULL){
-	//	MyNode=Droit(MyNode);
-	//}
 	
-	pr_node(root);
+	//pr_node(root);
 
 	//printf("Type:%i\n",MyNode->type_node);
   	//print_node(MyNode);
-	//stable_add(stable,"x",1);
-	//stable_add(stable,"y",2);
-	stable_print(stable);
+	stable_add(stable,"x",1);
+	stable_add(stable,"y",2);
+	
+	stable_stack_push(stable);
+	stable_stack_print(stable);
+	printf("Original addr:%i\n",(int)stable);			
+	//stable_print(stable);
 	
 	/* insert here the calls to the code generation main function */
   }
