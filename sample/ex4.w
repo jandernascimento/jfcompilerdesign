@@ -1,12 +1,11 @@
 
 declare
 
-
 	var x  ; 
 	var z 
 begin
 
-	x := 1  ;	
-	z := 50  	
+	x := 200  ;	
+	z := 2 * x    	
 
 end
