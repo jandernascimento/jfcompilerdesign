@@ -15,6 +15,25 @@ typedef struct list_t {
 list *stable=NULL;
 /** stable functions:start **/
 
+
+
+int stable_get(list *table,char *name){
+
+	list **original=table;
+	list *search=*original;
+	
+	if((*original)!=NULL)
+	for(;search!=NULL;search=search->next){
+			//printf("Comparando [%s]==[%s]\n",name,search->name);
+			if(strcmp(name,search->name)==0){
+				return search->value;
+			}	
+	}
+
+	 return NULL;
+
+}
+
 void stable_add(list *table,char *name,int value){
 
 	list **original=table;
@@ -65,6 +84,22 @@ void stable_sigma(list *table){
 	printf("]\n");
 }
 
+int stable_oper(list *table,NODE *node)
+{
+	if(node->type_node==NUM){
+		return node->val_node.u_int;
+	}else if(node->type_node==IDF){
+		printf("Buscando valor [%s]\n",node->val_node.u_str);
+		int val=stable_get(table,node->val_node.u_str);
+		return val;		
+	}else if(node->type_node==PLUS){
+		return stable_oper(table,node->fg)+stable_oper(table,node->fd);		
+	}else if(node->type_node==TIMES){
+		return stable_oper(table,node->fg)*stable_oper(table,node->fd);		
+	}
+	
+}
+
 /** stable functions:end **/
 
 
@@ -94,7 +129,7 @@ void stable_stack_print(){
 
 	int x;
 	for(x=0;x<stable_stack_size;x++){
-		printf("Element %i in Addr: %i\n",x,stable_stack[x]);
+		printf("Element %i in Addr: %i\n",x,(int)stable_stack[x]);
 	}
 
 }
@@ -154,15 +189,29 @@ NODE *n;
   	  pr_node(n->fd);
   	  break;
     case ASSIGN:
-	  stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
-  	  print_node(n->fg);
+  	  if(n->fd->type_node==NUM){
+	  	stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
+	  }else if (n->fd->type_node==IDF){
+		int val=stable_get(stable,n->fd->val_node.u_str);
+	  	stable_add(&stable,n->fg->val_node.u_str,val);
+	  }else if (n->fd->type_node==PLUS){
+		int res=stable_oper(&stable,n->fd);
+	  	stable_add(&stable,n->fg->val_node.u_str,res);
+	  }else if (n->fd->type_node==TIMES){
+		int res=stable_oper(&stable,n->fd);
+	  	stable_add(&stable,n->fg->val_node.u_str,res);
+	  }
+	  pr_node(n->fg);
 	  printf(":=") ;
-  	  print_node(n->fd);  
+  	  pr_node(n->fd);  
   	  stable_sigma(stable);
           break;
     case PLUS:
   	  pr_node(n->fg);
+	  print_sep();
+	  printf(" + ");
   	  pr_node(n->fd);
+	  print_sep();
   	  break;
     case AND:
   	  pr_node(n->fg);
@@ -184,12 +233,10 @@ NODE *n;
   	  pr_node(n->fd);
   	  break;
     case NUM:
-  	  //printf("%d",(n->val_node).u_int);
+  	  printf("%d",(n->val_node).u_int);
   	  break;
     case IDF:
-  	  //printf("--->%s\n", (n->val_node).u_str);
-  	  break;
-    case VAR:
+  	  printf("%s", (n->val_node).u_str);
   	  break;
     case CALL:
   	  pr_node(n->fg);
@@ -227,8 +274,8 @@ main (int argc, char *argv[])
 	pr_node(root);
 	//printf("Type:%i\n",MyNode->type_node);
   	//print_node(MyNode);
-	stable_add(&stable,"x",100);
-	stable_add(&stable,"y",2);
+	//stable_add(&stable,"x",100);
+	//stable_add(&stable,"y",2);
 	
 	//stable_stack_push(stable);
 	//stable_stack_print(stable);
