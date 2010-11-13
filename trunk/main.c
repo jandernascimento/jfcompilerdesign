@@ -89,13 +89,14 @@ int stable_oper(list *table,NODE *node)
 	if(node->type_node==NUM){
 		return node->val_node.u_int;
 	}else if(node->type_node==IDF){
-		printf("Buscando valor [%s]\n",node->val_node.u_str);
 		int val=stable_get(table,node->val_node.u_str);
 		return val;		
 	}else if(node->type_node==PLUS){
 		return stable_oper(table,node->fg)+stable_oper(table,node->fd);		
 	}else if(node->type_node==TIMES){
 		return stable_oper(table,node->fg)*stable_oper(table,node->fd);		
+	}else if(node->type_node==EGAL){
+		return stable_oper(table,node->fg)==stable_oper(table,node->fd);		
 	}
 	
 }
@@ -165,11 +166,19 @@ NODE *n;
   switch(n->type_node)
   {
     case COMMA:
+	  print_sep();
   	  pr_node(n->fg);
+	  printf(", ");
+	  print_sep();
   	  pr_node(n->fd);
   	  break;
     case SEMI_COLON:
+  	  print_sep();
+	  print_sep();
   	  pr_node(n->fg);
+	  //printf(" ;\n");
+	  print_sep();
+	  print_sep();
   	  pr_node(n->fd);
   	  break;
     case WHILE:
@@ -177,34 +186,42 @@ NODE *n;
   	  pr_node(n->fd);
   	  break;
     case IF:
+	  printf("\nIf ") ;
   	  pr_node(n->fg);
-  	  pr_node(n->fd);
+	  int res=stable_oper(&stable,n->fg);
+  	  if(res==1) pr_node(n->fd->fg);
+	  else pr_node(n->fd->fd);
+	  stable_sigma(stable);
   	  break;
     case THENELSE:
+	  printf(" Then ") ;
   	  pr_node(n->fg);
+	  printf(" Else ") ;
   	  pr_node(n->fd);
   	  break;
     case BLOC:
-  	  pr_node(n->fg);
+    	  pr_node(n->fg);
+	  printf("\nBegin\n") ;
   	  pr_node(n->fd);
+	  printf("\nEnd\n") ;
   	  break;
     case ASSIGN:
+	  pr_node(n->fg);
+	  printf(":=") ;
+  	  pr_node(n->fd);  
   	  if(n->fd->type_node==NUM){
 	  	stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
 	  }else if (n->fd->type_node==IDF){
 		int val=stable_get(stable,n->fd->val_node.u_str);
 	  	stable_add(&stable,n->fg->val_node.u_str,val);
-	  }else if (n->fd->type_node==PLUS){
+	  }else if (n->fd->type_node==PLUS||n->fd->type_node==TIMES){
 		int res=stable_oper(&stable,n->fd);
 	  	stable_add(&stable,n->fg->val_node.u_str,res);
-	  }else if (n->fd->type_node==TIMES){
+	  }else if (n->fd->type_node==IF){
 		int res=stable_oper(&stable,n->fd);
 	  	stable_add(&stable,n->fg->val_node.u_str,res);
 	  }
-	  pr_node(n->fg);
-	  printf(":=") ;
-  	  pr_node(n->fd);  
-  	  stable_sigma(stable);
+	  stable_sigma(stable);
           break;
     case PLUS:
   	  pr_node(n->fg);
@@ -223,14 +240,20 @@ NODE *n;
   	  break;
     case EGAL:
   	  pr_node(n->fg);
+	  print_sep();
   	  pr_node(n->fd);
+	  print_sep();
+	  printf(" = ");
   	  break;
     case NOT:
   	  pr_node(n->fg);
   	  break;
     case TIMES:
-  	  pr_node(n->fg);
+   	  pr_node(n->fg);
+	  print_sep();
   	  pr_node(n->fd);
+	  print_sep();
+	  printf(" * ");
   	  break;
     case NUM:
   	  printf("%d",(n->val_node).u_int);
@@ -243,13 +266,72 @@ NODE *n;
 	  pr_node(n->fd);
 	  break ;
     case PROC_DECL:
-  	  pr_node(n->fg);
+  	  printf("\nProc") ;
+	  print_sep();
+  	  print_node(n->fg);
+  	  printf("(");
   	  pr_node(n->fd->fg);
+  	  printf(")\n");
   	  pr_node(n->fd->fd);
-	break;
+	  break;
   }
   }
 }
+
+/*** BUG ***/
+
+char *decript(int val){
+  switch(val)
+  {
+    case COMMA:      return(","); break;
+    case SEMI_COLON: return(";"); break;
+    case WHILE:      return("While"); break;
+    case IF:         return("If"); break;
+    case THENELSE:   return("ThenElse"); break;
+    case BLOC:       return("Bloc"); break;
+    case ASSIGN:     return(":="); break;
+    case PLUS:       return("+"); break;
+    case AND:        return("and"); break;
+    case SUP:        return(">"); break;
+    case EGAL:       return("="); break;
+    case NOT:        return("NOT"); break;
+    case TIMES:      return("*"); break;
+    case NUM:        return("NUM"); break;
+    case IDF:        return("IDF"); break;
+    case CALL:       return("Call"); break ;
+    case PROC_DECL:  return("Proc"); break;
+  }
+}
+
+void full_spaces(int num){
+	int i;
+	for(i=1;i<=num;i++)
+		printf("\t");
+		
+}
+
+void print_tree_other(NODE *node, int level){
+	if (node != NULL){
+		printf("%s\n",decript(node->type_node));
+		if (node->fg != NULL){
+			full_spaces(level);
+			printf("LEFT ");
+			level++;
+			print_tree_other(node->fg,level);
+			level--;
+		}
+		if (node->fd != NULL){
+			full_spaces(level);
+			printf("RIGHT ");
+			level++;
+			print_tree_other(node->fd,level);
+			level--;
+		}
+	}
+}
+
+/** FIM BUG **/
+
 
 main (int argc, char *argv[])
 {
@@ -271,6 +353,11 @@ main (int argc, char *argv[])
   if (result==0){
    	//print_tree() ;
   	//print_node(root);
+
+  	//printf("\nPRINT_TREE_OTHER\n\n");
+  	//print_tree_other(root,1);
+  	//printf("\nEND PRINT_TREE_OTHER\n\n\n");
+
 	pr_node(root);
 	//printf("Type:%i\n",MyNode->type_node);
   	//print_node(MyNode);
