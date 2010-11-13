@@ -7,14 +7,17 @@
 -Creating functions to copy envivinroment based in another environemnt STOP
 -Creating function to print the stable in sigma format DONE
 -Implement assignment function(with sigma printing) DONE
--Implementing plus operation ON GOING
+-Implementing plus operation DONE
+-Implementing if operation DONE
+-Allow to show code without executing it ON GOING
 </JANDER>
 
 <BE>
 -Implement interpretation for node While ON GOING
--Implement interpretation for node If
--Implement interpretation for node Else
--Implement interpretation for node EGal
+-Implement interpretation for node And
+-Implement interpretation for node Not
+-Implement interpretation for node Procedure declaration
+
 </BE>
 
 
