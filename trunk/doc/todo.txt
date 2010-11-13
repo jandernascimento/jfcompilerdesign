@@ -4,9 +4,10 @@
 -Separate functions into different files, working as libraries
 -Fix function stable_add to do not make reference to global variable DONE
 -Fix issue: it's possible to add many time the same variable DONE
--Creating functions to copy envivinroment based in another environemnt ON GOING
+-Creating functions to copy envivinroment based in another environemnt STOP
 -Creating function to print the stable in sigma format DONE
 -Implement assignment function(with sigma printing) DONE
+-Implementing plus operation ON GOING
 </JANDER>
 
 <BE>
