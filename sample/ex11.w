@@ -3,6 +3,6 @@ declare
 	var x 
 
 begin
-	x := 1 	;
+	x := 5 	;
 	t := x
 end

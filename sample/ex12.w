@@ -5,8 +5,8 @@ declare
 		declare
 			var w
 		begin
-			x := 50; 
-			w := 72 
+			x := 80 ;
+			w := 50
 		end
 begin
 	x := 4 ;
