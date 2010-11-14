@@ -81,6 +81,17 @@ void stable_add(list *table,char *name,int value){
 	}	
 }
 
+list* stable_duplicate(list *table){
+	list *head=table;
+	list *newlist=NULL;
+	
+	for(;head!=NULL;head=head->next){
+		stable_add(&newlist,head->name,head->value);
+	}
+
+	return newlist;
+
+}
 void stable_print(list *table){
 	printf("\n\n/**** List of Variable ****/\n");
 	list *head=table;
