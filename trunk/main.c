@@ -31,18 +31,17 @@ listp *ptable=NULL;
 
 int stable_get(list *table,char *name){
 
-
-
 	list **original=table;
 	list *search=*original;
 	
 	//printf("Comparandoifff2 [%s]\n",name);
 	if((*original)!=NULL){
 		for(;search!=NULL;search=search->next){
-				//printf("Comparando1 [%s]\n",name);
-				//printf("Comparando2 [%s]\n",search->name);
+	//			printf("Comparando1 [%s]\n",name);
+	//			printf("Comparando2 [%s]\n",search->name);
+				//return 1;
 				if(strcmp(name,search->name)==0){
-					//printf("achou %i",search->value);
+	//				printf("achou %i",search->value);
 					return search->value;
 				}	
 		}
@@ -145,6 +144,8 @@ int stable_oper(list *table,NODE *node)
 	}else if(node->type_node==TIMES){
 		return stable_oper(table,node->fg)*stable_oper(table,node->fd);		
 	}else if(node->type_node==EGAL){
+		//printf("chegou no igual\n");
+		//printf("comparando [%i] [%i]",stable_oper(table,node->fg),stable_oper(table,node->fd));
 		return stable_oper(table,node->fg)==stable_oper(table,node->fd);		
 	}else if(node->type_node==AND){
 		return stable_oper(table,node->fg)&&stable_oper(table,node->fd);		
@@ -298,13 +299,11 @@ int execute;
   	  pr_node(n->fd,execute);
   	  break;
     case WHILE:
-  	  printf("\nWhile\n") ;
-	  printf("(");
-  	  pr_node(n->fg,execute);
-	  printf(")");
-	  printf("\nDo\n") ;
-  	  pr_node(n->fd,execute);
-	  printf("\nOd\n") ;
+	  while(stable_oper(&stable,n->fg)){
+		pr_node(n->fd);
+	  }
+	  //pr_node(n->fg,execute);
+  	  //pr_node(n->fd,execute);
   	  break;
     case IF:
 	  printf("\n<executing condition='") ;
@@ -349,7 +348,8 @@ int execute;
 	  		res=n->fd->val_node.u_int;
 	  		//stable_add(&stable,n->fg->val_node.u_str,res);
 	 	 }else if (n->fd->type_node==IDF){
-			res=stable_get(stable,n->fd->val_node.u_str);
+			res=stable_oper(&stable,n->fd);
+			//res=stable_get(stable,n->fd->val_node.u_str);
 			//stable_add(&stable,n->fg->val_node.u_str,res);
 	  	}else if (n->fd->type_node==PLUS||n->fd->type_node==TIMES){
 			res=stable_oper(&stable,n->fd);
@@ -388,7 +388,7 @@ int execute;
     case EGAL:
   	  pr_node(n->fg,execute);
 	  //print_sep();
-	  //printf(" = ");
+	  printf(" = ");
   	  pr_node(n->fd,execute);
 	  //print_sep();
   	  break;
@@ -510,23 +510,9 @@ main (int argc, char *argv[])
   result = yyparse() ; // call to the parser
   if (result==0){
   	//print_tree_other(root,1);
-	
 	pr_node(root,1);
-	//print_node(root);
-	//stable_add(&stable,"x",100);
-	//stable_add(&stable,"y",2);
-
-	
 	//stable_stack_push(stable);
 	//stable_stack_print(stable);
-	
-	//stable_print(stable);
-
-	//printf("enderecos fg:%i fd:%i\n",(int)root->fg,(int)root->fd);
-	//ptable_add(&ptable,"principal",root);
-	
 	ptable_print(ptable);
-	
-	/* insert here the calls to the code generation main function */
   }
 } 
