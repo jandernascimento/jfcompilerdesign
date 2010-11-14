@@ -19,7 +19,7 @@
 
 <BE>
 -Implement interpretation for node While ON GOING
--Write the manual
+-Write the manual DONE
 </BE>
 
 
