@@ -128,8 +128,6 @@ void ptable_add(listp *table,char *name,NODE *value){
 	listp **original=table;
 	listp *new_position=*original;
 	listp *search=*original;
-
-	printf("Adding NODE:%i\n",value);
 	
 	if((*original)==NULL){
 		(*original)=malloc(sizeof(list));
@@ -158,26 +156,23 @@ NODE* ptable_get(listp *table,char *name){
 
 	listp **original=table;
 	listp *search=*original;
-	listp **n;
 	if((*original)!=NULL)
 	for(;search!=NULL;search=search->next){
 			//printf("Comparando [%s]==[%s]\n",name,search->name);
 			if(strcmp(name,search->name)==0){
-				printf("Returning addr:%i\n",search);
-				return search;
+				return search->node;
 			}
 	}
-
+	printf("Nao achou");
 	 return NULL;
 
 }
 
 void ptable_print(listp *table){
-	//listp **original=table;
 	listp *head=table;
 	if(head!=NULL)
 	do {
-		printf("Name:%s root:%i\n",head->name,head);
+		printf("Name:%s root:%i\n",head->name,head->node);
 		head=head->next;
 	} while(head!=NULL);
 	else printf("envp[]\n");
@@ -347,13 +342,12 @@ NODE *n;
   	  pr_node(n->fg);
 	  printf("(");
 	  pr_node(n->fd);
-	  printf(")");  	  
-	  pr_node(ptable_get(&ptable,n->fg->val_node.u_str));
-	  //pr_node(ptable_get(&ptable,n->fg->val_node.u_str)->fg);
+	  printf(")");  	
+	  NODE *node=ptable_get(&ptable,n->fg->val_node.u_str); 
+	  pr_node(node->fd->fg);
+	  pr_node(node->fd->fd);
 	  break ;
     case PROC_DECL:
-  	  
-	  printf("Adding MAIN NODE:%i\n",n);
 	  printf("\nProc %s\n",n->fg->val_node.u_str) ;
 	  ptable_add(&ptable,n->fg->val_node.u_str,n);
 	  //printf("\nProc") ;

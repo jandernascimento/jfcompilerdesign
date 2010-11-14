@@ -13,12 +13,13 @@
 -Implementing AND operation DONE
 -Implementing SUP operation DONE
 -Implementing NOT operation DONE
+-Implementing PROC declaration operation DONE
+-Implementing CALL declaration
 </JANDER>
 
 <BE>
 -Implement interpretation for node While ON GOING
 -Write the manual
-
 </BE>
 
 
