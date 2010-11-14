@@ -12,13 +12,12 @@
 -Allow to show code without executing it ON GOING
 -Implementing AND operation DONE
 -Implementing SUP operation DONE
+-Implementing NOT operation DONE
 </JANDER>
 
 <BE>
 -Implement interpretation for node While ON GOING
--Implement interpretation for node And
--Implement interpretation for node Not
--Implement interpretation for node Procedure declaration
+-Write the manual
 
 </BE>
 
