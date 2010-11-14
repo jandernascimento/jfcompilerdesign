@@ -10,8 +10,8 @@
 -Implementing plus operation DONE
 -Implementing if operation DONE
 -Allow to show code without executing it ON GOING
--Implementing AND operation
--Implementing OR operation
+-Implementing AND operation DONE
+-Implementing SUP operation DONE
 </JANDER>
 
 <BE>
