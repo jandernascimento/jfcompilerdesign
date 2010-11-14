@@ -31,15 +31,21 @@ listp *ptable=NULL;
 
 int stable_get(list *table,char *name){
 
+
+
 	list **original=table;
-	list *search=*original;
+	list *search=table;//*original;
 	
-	if((*original)!=NULL)
-	for(;search!=NULL;search=search->next){
-			//printf("Comparando [%s]==[%s]\n",name,search->name);
-			if(strcmp(name,search->name)==0){
-				return search->value;
-			}	
+	//printf("Comparandoifff2 [%s]\n",table->name);
+	if((*original)!=NULL){
+		for(;search!=NULL;search=search->next){
+				//printf("Comparando1 [%s]\n",name);
+				//printf("Comparando2 [%s]\n",search->name);
+return 1;
+				if(strcmp(name,search->name)==0){
+					return search->value;
+				}	
+		}
 	}
 
 	 return NULL;
@@ -76,6 +82,7 @@ void stable_add(list *table,char *name,int value){
 }
 
 void stable_print(list *table){
+	printf("\n\n/**** List of Variable ****/\n");
 	list *head=table;
 	if(head!=NULL)
 	do {
@@ -87,13 +94,13 @@ void stable_print(list *table){
 
 void stable_sigma(list *table){
 	list *head=table;
-	printf("\tsigma[");
+	printf("sigma[");
 	if(head!=NULL)
 	do {
 		printf("%s->%i,",head->name,head->value);
 		head=head->next;
 	} while(head!=NULL);
-	printf("]\n");
+	printf("]");
 }
 
 int stable_oper(list *table,NODE *node)
@@ -163,16 +170,16 @@ NODE* ptable_get(listp *table,char *name){
 				return search->node;
 			}
 	}
-	printf("Nao achou");
-	 return NULL;
+	return NULL;
 
 }
 
 void ptable_print(listp *table){
 	listp *head=table;
+	printf("\n\n/**** List of procedure ****/\n");
 	if(head!=NULL)
 	do {
-		printf("Name:%s root:%i\n",head->name,head->node);
+		printf("Name:%s addr:%i\n",head->name,head->node);
 		head=head->next;
 	} while(head!=NULL);
 	else printf("envp[]\n");
@@ -235,99 +242,126 @@ check (char *s)
   if (yyin==NULL) usage() ;
 }
 
-pr_node(n)
+pr_node(n,execute)
 NODE *n;
+int execute;
 {
   if (n) {
   switch(n->type_node)
   {
     case COMMA:
 	  print_sep();
-  	  pr_node(n->fg);
+  	  pr_node(n->fg,execute);
 	  printf(", ");
 	  print_sep();
-  	  pr_node(n->fd);
+  	  pr_node(n->fd,execute);
   	  break;
     case SEMI_COLON:
   	  print_sep();
 	  print_sep();
-  	  pr_node(n->fg);
-	  //printf(" ;\n");
+  	  pr_node(n->fg,execute);
+	  printf(" ;");
+	  stable_sigma(stable);
+	  printf("\n");
 	  print_sep();
 	  print_sep();
-  	  pr_node(n->fd);
+  	  pr_node(n->fd,execute);
   	  break;
     case WHILE:
-  	  pr_node(n->fg);
-  	  pr_node(n->fd);
+  	  printf("\nWhile\n") ;
+	  printf("(");
+  	  pr_node(n->fg,execute);
+	  printf(")");
+	  printf("\nDo\n") ;
+  	  pr_node(n->fd,execute);
+	  printf("\nOd\n") ;
   	  break;
     case IF:
-	  printf("\nIf ") ;
-  	  pr_node(n->fg);
+	  printf("\n If ") ;
+  	  pr_node(n->fg,execute);
+  	  pr_node(n->fd,0);
 	  int res=stable_oper(&stable,n->fg);
-  	  if(res==1) pr_node(n->fd->fg);
-	  else pr_node(n->fd->fd);
-	  stable_sigma(stable);
+  	  if(res==1){//go to then
+		pr_node(n->fd->fg,execute);
+		//pr_node(n->fd->fd,0);
+	  } else{//go to else
+		//pr_node(n->fd->fg,0);
+		pr_node(n->fd->fd,execute);
+	  }
   	  break;
     case THENELSE:
 	  printf(" Then ") ;
-  	  pr_node(n->fg);
+  	  pr_node(n->fg,execute);
 	  printf(" Else ") ;
-  	  pr_node(n->fd);
+  	  //pr_node(n->fd,execute);
+	  //stable_sigma(stable);
   	  break;
     case BLOC:
-    	  pr_node(n->fg);
+    	  pr_node(n->fg,execute);
 	  printf("\nBegin\n") ;
-  	  pr_node(n->fd);
+  	  pr_node(n->fd,execute);
 	  printf("\nEnd\n") ;
   	  break;
     case ASSIGN:
-	  pr_node(n->fg);
+	  pr_node(n->fg,execute);
 	  printf(":=") ;
-  	  pr_node(n->fd);  
-  	  if(n->fd->type_node==NUM){
+  	  pr_node(n->fd,execute);  
+  	  
+	  if(execute){
+	  if(n->fd->type_node==NUM){
 	  	stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
 	  }else if (n->fd->type_node==IDF){
+		stable_print(stable);
 		int val=stable_get(stable,n->fd->val_node.u_str);
-	  	stable_add(&stable,n->fg->val_node.u_str,val);
+		stable_add(&stable,n->fg->val_node.u_str,val);
 	  }else if (n->fd->type_node==PLUS||n->fd->type_node==TIMES){
 		int res=stable_oper(&stable,n->fd);
 	  	stable_add(&stable,n->fg->val_node.u_str,res);
 	  }else if (n->fd->type_node==IF){
 		int res=stable_oper(&stable,n->fd);
 	  	stable_add(&stable,n->fg->val_node.u_str,res);
-	  }
-	  stable_sigma(stable);
+	  }}
+	  //stable_sigma(stable);
           break;
     case PLUS:
-  	  pr_node(n->fg);
+  	  pr_node(n->fg,execute);
 	  print_sep();
 	  printf(" + ");
-  	  pr_node(n->fd);
+  	  pr_node(n->fd,execute);
 	  print_sep();
   	  break;
     case AND:
-  	  pr_node(n->fg);
-  	  pr_node(n->fd);
-  	  break;
+  	  pr_node(n->fg,execute);
+	  print_sep();
+  	  pr_node(n->fd,execute);
+	  print_sep();
+  	  printf(" and ");
+	  break;
     case SUP:
-  	  pr_node(n->fg);
-  	  pr_node(n->fd);
+  	  pr_node(n->fg,execute);
+	  print_sep();
+  	  pr_node(n->fd,execute);
+	  print_sep();
+	  printf(" > ");
   	  break;
     case EGAL:
-  	  pr_node(n->fg);
-	  print_sep();
-  	  pr_node(n->fd);
+  	  pr_node(n->fg,execute);
 	  print_sep();
 	  printf(" = ");
+  	  pr_node(n->fd,execute);
+	  print_sep();
   	  break;
     case NOT:
-  	  pr_node(n->fg);
-  	  break;
-    case TIMES:
-   	  pr_node(n->fg);
+  	  printf("^");
+	  printf("(");
+  	  pr_node(n->fg,execute);
+	  printf(")");
 	  print_sep();
-  	  pr_node(n->fd);
+  	  break;	  
+    case TIMES:
+   	  pr_node(n->fg,execute);
+	  print_sep();
+  	  pr_node(n->fd,execute);
 	  print_sep();
 	  printf(" * ");
   	  break;
@@ -339,24 +373,25 @@ NODE *n;
   	  break;
     case CALL:
 	  printf("Call ");
-  	  pr_node(n->fg);
+  	  pr_node(n->fg,execute);
 	  printf("(");
-	  pr_node(n->fd);
-	  printf(")");  	
+	  pr_node(n->fd,execute);
+	  printf(")\n");  	
 	  NODE *node=ptable_get(&ptable,n->fg->val_node.u_str); 
-	  pr_node(node->fd->fg);
-	  pr_node(node->fd->fd);
+	  pr_node(node->fd->fg,execute);
+	  //stable_print(stable);
+	  pr_node(node->fd->fd,execute);
 	  break ;
     case PROC_DECL:
 	  printf("\nProc %s\n",n->fg->val_node.u_str) ;
 	  ptable_add(&ptable,n->fg->val_node.u_str,n);
 	  //printf("\nProc") ;
 	  //print_sep();
-  	  //pr_node(n->fg);
+  	  //pr_node(n->fg,0);
   	  //printf("(");
-  	  //pr_node(n->fd->fg);
+  	  //pr_node(n->fd->fg,0);
   	  //printf(")\n");
-  	  //pr_node(n->fd->fd);
+  	  //pr_node(n->fd->fd,0);
 	  break;
   }
   }
@@ -437,16 +472,19 @@ main (int argc, char *argv[])
   if (result==0){
   	//print_tree_other(root,1);
 
-	pr_node(root);
+	pr_node(root,1);
+	//print_node(root);
 	//stable_add(&stable,"x",100);
 	//stable_add(&stable,"y",2);
 	
 	//stable_stack_push(stable);
 	//stable_stack_print(stable);
+	
 	stable_print(stable);
 
 	//printf("enderecos fg:%i fd:%i\n",(int)root->fg,(int)root->fd);
 	//ptable_add(&ptable,"principal",root);
+	
 	ptable_print(ptable);
 	
 	/* insert here the calls to the code generation main function */
