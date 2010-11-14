@@ -90,17 +90,36 @@ list* stable_duplicate(list *table){
 	}
 
 	return newlist;
+}
+
+void stable_compare(list *table,list *other){
+	list *head=table;
+	list *tail=other;
+	
+	for(;head!=NULL;head=head->next){
+		int found=1;
+		for(;tail!=NULL;tail=tail->next){
+			if(strcmp(head->name,tail->name)==0){
+				found=0;
+			}
+		}
+
+		if(found==1){
+			stable_add(&stable,head->name,NULL);
+		}
+	}
 
 }
+
 void stable_print(list *table){
-	printf("\n\n/**** List of Variable ****/\n");
+	printf("\n<Environment type=Variable >\n");
 	list *head=table;
 	if(head!=NULL)
 	do {
-		printf("Name:%s Value:%i\n",head->name,head->value);
+		if(head->value!=NULL) printf("Name:%s Value:%i\n",head->name,head->value);
 		head=head->next;
 	} while(head!=NULL);
-
+	printf("</Environment>\n");
 }
 
 void stable_sigma(list *table){
@@ -187,14 +206,14 @@ NODE* ptable_get(listp *table,char *name){
 
 void ptable_print(listp *table){
 	listp *head=table;
-	printf("\n\n/**** List of procedure ****/\n");
+	printf("\n<Environment type=Procedure >\n");
 	if(head!=NULL)
 	do {
 		printf("Name:%s addr:%i\n",head->name,head->node);
 		head=head->next;
 	} while(head!=NULL);
 	else printf("envp[]\n");
-
+	printf("</Environment>\n");
 }
 /** ptable functions:end **/
 
@@ -257,6 +276,7 @@ pr_node(n,execute)
 NODE *n;
 int execute;
 {
+  list *customtable=NULL;
   if (n) {
   switch(n->type_node)
   {
@@ -308,10 +328,13 @@ int execute;
 	  //stable_sigma(stable);
   	  break;
     case BLOC:
-    	  pr_node(n->fg,execute);
+    	  customtable=stable_duplicate(stable);
+	  pr_node(n->fg,execute);
 	  printf("\nBegin\n") ;
   	  pr_node(n->fd,execute);
+	  stable_print(stable);
 	  printf("\nEnd\n") ;
+	  stable_compare(stable,customtable);
   	  break;
     case ASSIGN:
 	  pr_node(n->fg,execute);
@@ -482,16 +505,17 @@ main (int argc, char *argv[])
   result = yyparse() ; // call to the parser
   if (result==0){
   	//print_tree_other(root,1);
-
+	
 	pr_node(root,1);
 	//print_node(root);
 	//stable_add(&stable,"x",100);
 	//stable_add(&stable,"y",2);
+
 	
 	//stable_stack_push(stable);
 	//stable_stack_print(stable);
 	
-	stable_print(stable);
+	//stable_print(stable);
 
 	//printf("enderecos fg:%i fd:%i\n",(int)root->fg,(int)root->fd);
 	//ptable_add(&ptable,"principal",root);
