@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include "type.h"
 
-/*** MY TABLE **/
+/*** TABLE for variable **/
 typedef struct list_t {
 
 	char *name;
@@ -12,7 +12,19 @@ typedef struct list_t {
 
 } list;
 
+
+/*** TABLE for procedure **/
+typedef struct list_p {
+
+	char *name;
+	NODE *node;
+	struct list_p *next;
+
+} listp;
+
+
 list *stable=NULL;
+listp *ptable=NULL;
 /** stable functions:start **/
 
 
@@ -109,6 +121,69 @@ int stable_oper(list *table,NODE *node)
 
 /** stable functions:end **/
 
+/** ptable functions:begin **/
+
+void ptable_add(listp *table,char *name,NODE *value){
+
+	listp **original=table;
+	listp *new_position=*original;
+	listp *search=*original;
+
+	printf("Adding NODE:%i\n",value);
+	
+	if((*original)==NULL){
+		(*original)=malloc(sizeof(list));
+		(*original)->name=name;
+		(*original)->node=value;
+		(*original)->next=NULL;
+	}else{
+		for(;search!=NULL;search=search->next){
+			//printf("Comparando %s e %s cmp value:%i\n",search->name,name,strcmp(name,search->name));
+			if(strcmp(name,search->name)==0){
+				search->node=value;
+				return;
+			}	
+		}
+		listp *new_node;
+		new_node=malloc(sizeof(list));
+		new_node->name=name;
+		new_node->node=value;
+		new_node->next=NULL;
+		for(;new_position->next!=NULL;new_position=new_position->next);
+		new_position->next=new_node;	
+	}	
+}
+
+NODE* ptable_get(listp *table,char *name){
+
+	listp **original=table;
+	listp *search=*original;
+	listp **n;
+	if((*original)!=NULL)
+	for(;search!=NULL;search=search->next){
+			//printf("Comparando [%s]==[%s]\n",name,search->name);
+			if(strcmp(name,search->name)==0){
+				printf("Returning addr:%i\n",search);
+				return search;
+			}
+	}
+
+	 return NULL;
+
+}
+
+void ptable_print(listp *table){
+	//listp **original=table;
+	listp *head=table;
+	if(head!=NULL)
+	do {
+		printf("Name:%s root:%i\n",head->name,head);
+		head=head->next;
+	} while(head!=NULL);
+	else printf("envp[]\n");
+
+}
+/** ptable functions:end **/
 
 /** stable stack functions:start **/
 
@@ -268,17 +343,26 @@ NODE *n;
   	  printf("%s", (n->val_node).u_str);
   	  break;
     case CALL:
+	  printf("Call ");
   	  pr_node(n->fg);
+	  printf("(");
 	  pr_node(n->fd);
+	  printf(")");  	  
+	  pr_node(ptable_get(&ptable,n->fg->val_node.u_str));
+	  //pr_node(ptable_get(&ptable,n->fg->val_node.u_str)->fg);
 	  break ;
     case PROC_DECL:
-  	  printf("\nProc") ;
-	  print_sep();
-  	  print_node(n->fg);
-  	  printf("(");
-  	  pr_node(n->fd->fg);
-  	  printf(")\n");
-  	  pr_node(n->fd->fd);
+  	  
+	  printf("Adding MAIN NODE:%i\n",n);
+	  printf("\nProc %s\n",n->fg->val_node.u_str) ;
+	  ptable_add(&ptable,n->fg->val_node.u_str,n);
+	  //printf("\nProc") ;
+	  //print_sep();
+  	  //pr_node(n->fg);
+  	  //printf("(");
+  	  //pr_node(n->fd->fg);
+  	  //printf(")\n");
+  	  //pr_node(n->fd->fd);
 	  break;
   }
   }
@@ -357,23 +441,19 @@ main (int argc, char *argv[])
 
   result = yyparse() ; // call to the parser
   if (result==0){
-   	//print_tree() ;
-  	//print_node(root);
-
-  	//printf("\nPRINT_TREE_OTHER\n\n");
   	//print_tree_other(root,1);
-  	//printf("\nEND PRINT_TREE_OTHER\n\n\n");
 
 	pr_node(root);
-	//printf("Type:%i\n",MyNode->type_node);
-  	//print_node(MyNode);
 	//stable_add(&stable,"x",100);
 	//stable_add(&stable,"y",2);
 	
 	//stable_stack_push(stable);
 	//stable_stack_print(stable);
-	//printf("Original addr:%i\n",(int)stable);			
 	stable_print(stable);
+
+	//printf("enderecos fg:%i fd:%i\n",(int)root->fg,(int)root->fd);
+	//ptable_add(&ptable,"principal",root);
+	ptable_print(ptable);
 	
 	/* insert here the calls to the code generation main function */
   }
