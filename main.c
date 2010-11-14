@@ -101,6 +101,8 @@ int stable_oper(list *table,NODE *node)
 		return stable_oper(table,node->fg)&&stable_oper(table,node->fd);		
 	}else if(node->type_node==SUP){
 		return stable_oper(table,node->fg)>stable_oper(table,node->fd);		
+	}else if(node->type_node==NOT){
+		return !stable_oper(table,node->fg);		
 	}
 	
 }
