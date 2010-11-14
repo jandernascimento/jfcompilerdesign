@@ -34,15 +34,15 @@ int stable_get(list *table,char *name){
 
 
 	list **original=table;
-	list *search=table;//*original;
+	list *search=*original;
 	
-	//printf("Comparandoifff2 [%s]\n",table->name);
+	//printf("Comparandoifff2 [%s]\n",name);
 	if((*original)!=NULL){
 		for(;search!=NULL;search=search->next){
 				//printf("Comparando1 [%s]\n",name);
 				//printf("Comparando2 [%s]\n",search->name);
-return 1;
 				if(strcmp(name,search->name)==0){
+					//printf("achou %i",search->value);
 					return search->value;
 				}	
 		}
@@ -105,21 +105,21 @@ void stable_compare(list *table,list *other){
 		}
 
 		if(found==1){
-			stable_add(&stable,head->name,NULL);
+			stable_add(&stable,head->name,-1);
 		}
 	}
 
 }
 
 void stable_print(list *table){
-	printf("\n<Environment type=Variable >\n");
+	printf("\n<environment type=variable >\n");
 	list *head=table;
 	if(head!=NULL)
 	do {
-		if(head->value!=NULL) printf("Name:%s Value:%i\n",head->name,head->value);
+		if(head->value!=-1) printf("Name:%s Value:%i\n",head->name,head->value);
 		head=head->next;
 	} while(head!=NULL);
-	printf("</Environment>\n");
+	printf("</environment>\n");
 }
 
 void stable_sigma(list *table){
@@ -206,14 +206,14 @@ NODE* ptable_get(listp *table,char *name){
 
 void ptable_print(listp *table){
 	listp *head=table;
-	printf("\n<Environment type=Procedure >\n");
+	printf("\n<environment type=procedure >\n");
 	if(head!=NULL)
 	do {
 		printf("Name:%s addr:%i\n",head->name,head->node);
 		head=head->next;
 	} while(head!=NULL);
 	else printf("envp[]\n");
-	printf("</Environment>\n");
+	printf("</environment>\n");
 }
 /** ptable functions:end **/
 
@@ -291,9 +291,8 @@ int execute;
   	  print_sep();
 	  print_sep();
   	  pr_node(n->fg,execute);
-	  printf(" ;");
-	  stable_sigma(stable);
-	  printf("\n");
+	  //printf(" ;\n");
+	  //stable_sigma(stable);
 	  print_sep();
 	  print_sep();
   	  pr_node(n->fd,execute);
@@ -308,17 +307,18 @@ int execute;
 	  printf("\nOd\n") ;
   	  break;
     case IF:
-	  printf("\n If ") ;
+	  printf("\n<executing condition='") ;
+  	  print_node(n->fg);
   	  pr_node(n->fg,execute);
-  	  pr_node(n->fd,0);
+  	  //pr_node(n->fd,0);
 	  int res=stable_oper(&stable,n->fg);
+	  printf("' going_to='%s'>\n",res==1?"if":"else") ;
   	  if(res==1){//go to then
 		pr_node(n->fd->fg,execute);
-		//pr_node(n->fd->fd,0);
 	  } else{//go to else
-		//pr_node(n->fd->fg,0);
 		pr_node(n->fd->fd,execute);
 	  }
+	  printf("\n</executing>\n") ;
   	  break;
     case THENELSE:
 	  printf(" Then ") ;
@@ -328,39 +328,46 @@ int execute;
 	  //stable_sigma(stable);
   	  break;
     case BLOC:
+	  stable_print(stable);
     	  customtable=stable_duplicate(stable);
 	  pr_node(n->fg,execute);
-	  printf("\nBegin\n") ;
+	  printf("\n");
+	  //printf("\nBegin\n") ;
   	  pr_node(n->fd,execute);
+	  //printf("\nEnd\n") ;
 	  stable_print(stable);
-	  printf("\nEnd\n") ;
 	  stable_compare(stable,customtable);
   	  break;
     case ASSIGN:
 	  pr_node(n->fg,execute);
-	  printf(":=") ;
+	  //printf(":=") ;
   	  pr_node(n->fd,execute);  
   	  
 	  if(execute){
-	  if(n->fd->type_node==NUM){
-	  	stable_add(&stable,n->fg->val_node.u_str,n->fd->val_node.u_int);
-	  }else if (n->fd->type_node==IDF){
-		stable_print(stable);
-		int val=stable_get(stable,n->fd->val_node.u_str);
-		stable_add(&stable,n->fg->val_node.u_str,val);
-	  }else if (n->fd->type_node==PLUS||n->fd->type_node==TIMES){
-		int res=stable_oper(&stable,n->fd);
-	  	stable_add(&stable,n->fg->val_node.u_str,res);
-	  }else if (n->fd->type_node==IF){
-		int res=stable_oper(&stable,n->fd);
-	  	stable_add(&stable,n->fg->val_node.u_str,res);
-	  }}
+	  	 int res=NULL;
+		 if(n->fd->type_node==NUM){
+	  		res=n->fd->val_node.u_int;
+	  		//stable_add(&stable,n->fg->val_node.u_str,res);
+	 	 }else if (n->fd->type_node==IDF){
+			res=stable_get(stable,n->fd->val_node.u_str);
+			//stable_add(&stable,n->fg->val_node.u_str,res);
+	  	}else if (n->fd->type_node==PLUS||n->fd->type_node==TIMES){
+			res=stable_oper(&stable,n->fd);
+	 	 	//stable_add(&stable,n->fg->val_node.u_str,res);
+	  	}else if (n->fd->type_node==IF){
+			res=stable_oper(&stable,n->fd);
+	  		//stable_add(&stable,n->fg->val_node.u_str,res);
+	  	}
+		printf("\n<assign variable=%s value=%i />\n",n->fg->val_node.u_str,res);
+		stable_add(&stable,n->fg->val_node.u_str,res);
+	  }
 	  //stable_sigma(stable);
-          break;
+          printf("\n");
+	  break;
     case PLUS:
   	  pr_node(n->fg,execute);
 	  print_sep();
-	  printf(" + ");
+	  //printf(" + ");
   	  pr_node(n->fd,execute);
 	  print_sep();
   	  break;
@@ -376,20 +383,20 @@ int execute;
 	  print_sep();
   	  pr_node(n->fd,execute);
 	  print_sep();
-	  printf(" > ");
+	 // printf(" > ");
   	  break;
     case EGAL:
   	  pr_node(n->fg,execute);
-	  print_sep();
-	  printf(" = ");
+	  //print_sep();
+	  //printf(" = ");
   	  pr_node(n->fd,execute);
-	  print_sep();
+	  //print_sep();
   	  break;
     case NOT:
-  	  printf("^");
-	  printf("(");
+  	  //printf("^");
+	  //printf("(");
   	  pr_node(n->fg,execute);
-	  printf(")");
+	  //printf(")");
 	  print_sep();
   	  break;	  
     case TIMES:
@@ -397,27 +404,25 @@ int execute;
 	  print_sep();
   	  pr_node(n->fd,execute);
 	  print_sep();
-	  printf(" * ");
+	  //printf(" * ");
   	  break;
     case NUM:
-  	  printf("%d",(n->val_node).u_int);
+  	  //printf("%d",(n->val_node).u_int);
   	  break;
     case IDF:
-  	  printf("%s", (n->val_node).u_str);
+  	  //printf("%s", (n->val_node).u_str);
   	  break;
     case CALL:
-	  printf("Call ");
-  	  pr_node(n->fg,execute);
-	  printf("(");
-	  pr_node(n->fd,execute);
-	  printf(")\n");  	
+	  stable_print(stable);
+	  printf("\n<call name=%s >\n",n->fg->val_node.u_str);
 	  NODE *node=ptable_get(&ptable,n->fg->val_node.u_str); 
-	  pr_node(node->fd->fg,execute);
-	  //stable_print(stable);
+	  //pr_node(node->fd->fg,execute);
 	  pr_node(node->fd->fd,execute);
-	  break ;
+	  stable_print(stable);
+	  printf("\n</call>");
+	break ;
     case PROC_DECL:
-	  printf("\nProc %s\n",n->fg->val_node.u_str) ;
+	  //printf("\nProc %s\n",n->fg->val_node.u_str) ;
 	  ptable_add(&ptable,n->fg->val_node.u_str,n);
 	  //printf("\nProc") ;
 	  //print_sep();
