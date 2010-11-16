@@ -1,3 +1,8 @@
+/***
+Authors: B. Omidvar Tehrani, J. Nascimento (MoSIG M1 Students)
+Date: 11th November 2010
+***/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -299,11 +304,15 @@ int execute;
   	  pr_node(n->fd,execute);
   	  break;
     case WHILE:
+	  
+	  printf("\n<while>\n");
+	  
 	  while(stable_oper(&stable,n->fg)){
 		pr_node(n->fd);
 	  }
 	  //pr_node(n->fg,execute);
   	  //pr_node(n->fd,execute);
+	  printf("\n</while>\n");
   	  break;
     case IF:
 	  printf("\n<executing condition='") ;
@@ -424,40 +433,8 @@ int execute;
     case PROC_DECL:
 	  //printf("\nProc %s\n",n->fg->val_node.u_str) ;
 	  ptable_add(&ptable,n->fg->val_node.u_str,n);
-	  //printf("\nProc") ;
-	  //print_sep();
-  	  //pr_node(n->fg,0);
-  	  //printf("(");
-  	  //pr_node(n->fd->fg,0);
-  	  //printf(")\n");
-  	  //pr_node(n->fd->fd,0);
 	  break;
   }
-  }
-}
-
-/*** BUG ***/
-
-char *decript(int val){
-  switch(val)
-  {
-    case COMMA:      return(","); break;
-    case SEMI_COLON: return(";"); break;
-    case WHILE:      return("While"); break;
-    case IF:         return("If"); break;
-    case THENELSE:   return("ThenElse"); break;
-    case BLOC:       return("Bloc"); break;
-    case ASSIGN:     return(":="); break;
-    case PLUS:       return("+"); break;
-    case AND:        return("and"); break;
-    case SUP:        return(">"); break;
-    case EGAL:       return("="); break;
-    case NOT:        return("NOT"); break;
-    case TIMES:      return("*"); break;
-    case NUM:        return("NUM"); break;
-    case IDF:        return("IDF"); break;
-    case CALL:       return("Call"); break ;
-    case PROC_DECL:  return("Proc"); break;
   }
 }
 
@@ -467,29 +444,6 @@ void full_spaces(int num){
 		printf("\t");
 		
 }
-
-void print_tree_other(NODE *node, int level){
-	if (node != NULL){
-		printf("%s\n",decript(node->type_node));
-		if (node->fg != NULL){
-			full_spaces(level);
-			printf("LEFT ");
-			level++;
-			print_tree_other(node->fg,level);
-			level--;
-		}
-		if (node->fd != NULL){
-			full_spaces(level);
-			printf("RIGHT ");
-			level++;
-			print_tree_other(node->fd,level);
-			level--;
-		}
-	}
-}
-
-/** FIM BUG **/
-
 
 main (int argc, char *argv[])
 {
@@ -509,10 +463,7 @@ main (int argc, char *argv[])
 
   result = yyparse() ; // call to the parser
   if (result==0){
-  	//print_tree_other(root,1);
 	pr_node(root,1);
-	//stable_stack_push(stable);
-	//stable_stack_print(stable);
 	ptable_print(ptable);
   }
 } 
